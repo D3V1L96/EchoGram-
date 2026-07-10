@@ -4,7 +4,72 @@ import logging
 import asyncio
 import random
 import requests
+import time
+import getpass
 from aiograpi import Client
+
+
+# ====================== COOL ANIMATED BANNER ======================
+def print_banner():
+    banner = [
+        "╔════════════════════════════════════════════════════════════════════════════╗",
+        "║                                                                            ║",
+        "║   ███████╗ ██████╗██╗  ██╗ ██████╗  ██████╗ ██████╗  █████╗ ███╗   ███╗   ║",
+        "║   ██╔════╝██╔════╝██║  ██║██╔═══██╗██╔════╝██╔═══██╗██╔══██╗████╗ ████║   ║",
+        "║   █████╗  ██║     ███████║██║   ██║██║     ██║   ██║███████║██╔████╔██║   ║",
+        "║   ██╔══╝  ██║     ██╔══██║██║   ██║██║     ██║   ██║██╔══██║██║╚██╔╝██║   ║",
+        "║   ███████╗╚██████╗██║  ██║╚██████╔╝╚██████╗╚██████╔╝██║  ██║██║ ╚═╝ ██║   ║",
+        "║   ╚══════╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝   ║",
+        "║                                                                            ║",
+        "║                              POWERED BY  D4RK                              ║",
+        "╚════════════════════════════════════════════════════════════════════════════╝"
+    ]
+
+    # Cool color animation simulation
+    colors = ['\033[91m', '\033[93m', '\033[92m', '\033[96m', '\033[95m']
+    for i, line in enumerate(banner):
+        color = colors[i % len(colors)]
+        print(f"{color}{line}\033[0m")
+        time.sleep(0.08)
+    print("\033[1;37m" + "═" * 76 + "\033[0m")
+
+
+def typing_effect(text, delay=0.03, color='\033[96m'):
+
+    for char in text:
+        sys.stdout.write(f"{color}{char}\033[0m")
+        sys.stdout.flush()
+        time.sleep(delay)
+    print()
+
+
+def show_motivation():
+    quotes = [
+        "Every line of code is a step toward immortality.",
+        "Build what others believe is impossible.",
+        "Legacies are written in code, not words."
+
+    ]
+    print("\033[1;93m" + " MOTIVATION FOR THE BUILDER " + "\033[0m")
+    for quote in quotes:
+        typing_effect("   " + quote, delay=0.02)
+        time.sleep(0.8)
+
+
+# ====================== PASSWORD PROTECTION ======================
+def check_password():
+    correct_password = "darkdevil2026"  # Change this to your secure password
+    print("\033[1;91m" + " EchoGram is password protected" + "\033[0m")
+    for attempt in range(3):
+        password = getpass.getpass(f"Enter password (Attempt {attempt + 1}/3): ")
+        if password == correct_password:
+            typing_effect(" Access Granted. Welcome, DarkDevil!", delay=0.05, color='\033[92m')
+            return True
+        else:
+            print(f"\033[91m Wrong password. {2 - attempt} attempts left.\033[0m")
+    print("\033[91mToo many failed attempts. Exiting...\033[0m")
+    sys.exit(1)
+
 
 # ====================== CLEAN LOGGING ======================
 class CleanFilter(logging.Filter):
@@ -13,6 +78,7 @@ class CleanFilter(logging.Filter):
         if any(word in msg for word in ["none [200]", "http request", "i.instagram.com", "httpx", "httpcore"]):
             return False
         return True
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -24,12 +90,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 logging.getLogger().addFilter(CleanFilter())
-
 for pkg in ["aiograpi", "httpx", "httpcore"]:
     logging.getLogger(pkg).setLevel(logging.ERROR)
 
 # ====================== GROQ CONFIG ======================
-GROQ_API_KEY = "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"   # ← PUT YOUR GROQ KEY HERE
+GROQ_API_KEY = "your groq api"
 SESSION_FILE = "instagram_session.json"
 
 
@@ -39,7 +104,6 @@ class HeartInstagram:
         self.cl.delay_range = [1, 3]
         self.cl.set_locale("en_US")
         self.cl.set_timezone_offset(-19800)
-
         self.logged_in = False
         self.conversation_history = {}
         self.last_message_ids = {}
@@ -48,7 +112,7 @@ class HeartInstagram:
 
     # ====================== TEST GROQ ======================
     def test_groq(self):
-        print("🔍 Testing Groq API...")
+        print(" pleae wait for a movement we are checking your creditonals ...")
         try:
             response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
@@ -60,19 +124,19 @@ class HeartInstagram:
                     "model": "llama-3.3-70b-versatile",
                     "messages": [{"role": "user", "content": "Reply only: Groq is working perfectly! ❤️"}],
                     "max_tokens": 50,
-                    "temperature": 0.7
+                    "temperature": 0.9
                 },
                 timeout=15
             )
             if response.status_code == 200:
                 reply = response.json()['choices'][0]['message']['content'].strip()
-                print(f"✅ Groq Working! {reply}")
+                print(f" congrass cred match its Working! {reply}")
                 return True
             else:
-                print(f"❌ Groq Error {response.status_code}: {response.text[:200]}")
+                print(f" invalid Error {response.status_code}: {response.text[:200]}")
                 return False
         except Exception as e:
-            print(f"⚠️ Groq Test Failed: {e}")
+            print(f"sorry Test Failed: {e}")
             return False
 
     async def login(self):
@@ -81,75 +145,58 @@ class HeartInstagram:
                 self.cl.load_settings(SESSION_FILE)
                 await self.cl.account_info()
                 self.logged_in = True
-                print("✅ Loaded saved session")
+                print(" Loaded saved session")
                 return True
             except:
                 os.remove(SESSION_FILE)
-
         print("\n" + "=" * 70)
         print("LOGIN IN BROWSER")
         print("=" * 70)
         input("\nPress Enter after login... ")
         sessionid = input("SessionID: ").strip()
         if len(sessionid) < 30:
-            print("❌ Invalid sessionid")
+            print(" Invalid sessionid")
             return False
-
         try:
             await self.cl.login_by_sessionid(sessionid)
             await self.cl.account_info()
             self.cl.dump_settings(SESSION_FILE)
             self.logged_in = True
-            print("✅ Login Successful!")
+            print(" Login Successful!")
             return True
         except Exception as e:
-            print(f"❌ Login failed: {e}")
+            print(f" Login failed: {e}")
             return False
 
     # ====================== AI REPLY WITH GROQ ======================
     def _generate_reply_sync(self, sender_username, message, history=None):
         context = "\n".join(history[-8:]) if history else ""
         prompt = f"""You are a calm, mature, emotionally intelligent Indian man in your early 30s.
-
 Speak naturally like a real person, not a therapist, coach, or AI assistant. You understand emotions, relationships, stress, ambition, loneliness, and everyday life experiences. You listen first, then respond thoughtfully.
-
 Use a natural mix of English and Hindi (Hinglish) when it feels appropriate. Never force Hindi into every sentence. Speak the way educated young Indians naturally talk with friends.
-
 Keep responses concise and conversational (10-35 words unless a detailed answer is needed).
-
 When someone shares a problem:
-
 * Acknowledge their feelings naturally.
 * Don't immediately jump into solutions.
 * Show understanding before giving advice.
 * Be honest, practical, and balanced.
-
 Avoid:
-
 * Overly motivational speeches.
 * Generic self-help language.
 * Sounding like a therapist.
 * Excessive enthusiasm.
 * Unnecessary emojis.
-
 Use humor occasionally when it fits the situation.
-
 Your tone should feel like:
-
 * A trusted older brother.
 * A thoughtful friend.
 * Someone who has seen enough life to stay calm under pressure.
-
 The goal is to make people feel understood, respected, and comfortable talking openly.
-.
 
 Recent conversation:
 {context}
-
 @{sender_username}: {message}
-
 Natural reply:"""
-
         try:
             response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
@@ -158,23 +205,20 @@ Natural reply:"""
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "llama-3.3-70b-versatile",   # Very good & fast
+                    "model": "llama-3.3-70b-versatile",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.92,
                     "max_tokens": 180
                 },
                 timeout=20
             )
-
             if response.status_code == 200:
                 reply = response.json()['choices'][0]['message']['content'].strip()[:180]
                 logger.info(f"Groq reply for @{sender_username}: {reply}")
                 return reply
-
         except Exception as e:
             logger.error(f"Groq Error: {e}")
-
-        return random.choice(["Samajh gaya, batao kya baat hai"],"Main yahan hoon, batao")
+        return random.choice(["Samajh gaya, batao kya baat hai", "Main yahan hoon, batao"])
 
     async def human_typing_delay(self, text_length: int):
         base = 1.2 if text_length < 40 else 2.4
@@ -201,77 +245,58 @@ Natural reply:"""
         try:
             if not isinstance(payload, dict):
                 return
-
             if event_type in ["message", "direct"]:
                 item = payload.get("message") or payload
                 thread_id = payload.get("thread_id") or item.get("thread_id")
                 text = item.get("text") if isinstance(item, dict) else None
-
                 user_id = str(item.get("user_id") or payload.get("user_id") or 0)
                 username = await self._resolve_username(user_id)
                 message_id = item.get("item_id") or item.get("id")
-
                 if not text or not thread_id or user_id == str(self.cl.user_id):
                     return
                 if self.last_message_ids.get(user_id) == message_id:
                     return
-
                 self.last_message_ids[user_id] = message_id
-
-                print(f"📩 New from @{username}: {text}")
-
+                print(f" New from @{username}: {text}")
                 if self.rt:
                     try:
                         await self.rt.direct_indicate_activity(thread_id, is_active=True)
                     except:
                         pass
-
                 await self.human_typing_delay(len(text))
                 if random.random() < 0.2:
                     await asyncio.sleep(random.uniform(5, 15))
-
                 reply = self._generate_reply_sync(username, text, self.conversation_history.get(username))
                 if reply:
                     await self.cl.direct_send(reply, thread_ids=[thread_id])
-                    print(f"❤️ To @{username}: {reply}")
-
+                    print(f" To @{username}: {reply}")
                     history = self.conversation_history.setdefault(username, [])
                     history.extend([f"They: {text}", f"You: {reply}"])
                     if len(history) > 16:
                         history.pop(0)
-
             else:
                 user_id = str(payload.get("user_id") or 0)
                 username = await self._resolve_username(user_id)
-                print(f"🔔 Activity from @{username} | Type: {event_type}")
-
+                print(f" Activity from @{username} | Type: {event_type}")
         except Exception as e:
             logger.error(f"Handler error: {e}")
 
     # ====================== MAIN ======================
     async def run(self):
         if not self.test_groq():
-            print("⚠️ Continuing anyway...")
-
+            print(" Continuing anyway...")
         if not await self.login():
             return
-
         print("\n" + "=" * 95)
-        print("❤️ HEART INSTAGRAM BOT — GROQ MODE (Fast)")
-        print("✅ Real Username Resolution + Groq")
+        print("ECOGRAM INSTAGRAM BOT ")
         print("=" * 95 + "\n")
-
         try:
             self.rt = await self.cl.realtime_connect()
-
             self.cl.realtime_on("message", lambda p: self.handle_event("message", p))
             self.cl.realtime_on("direct", lambda p: self.handle_event("direct", p))
             self.cl.realtime_on("activity", lambda p: self.handle_event("activity", p))
-
             await self.rt.direct_subscribe()
-
-            print("🎧 Listening...")
-
+            print(" Listening...")
             while True:
                 try:
                     await self.cl.realtime_read_once()
@@ -281,9 +306,8 @@ Natural reply:"""
                     await asyncio.sleep(0.2)
                 except Exception:
                     await asyncio.sleep(3)
-
         except KeyboardInterrupt:
-            print("\n🛑 Stopped.")
+            print("\n Stopped.")
         except Exception as e:
             logger.error(f"Fatal: {e}")
         finally:
@@ -295,4 +319,17 @@ Natural reply:"""
 
 
 if __name__ == "__main__":
+    # Cool startup sequence
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print_banner()
+
+    typing_effect(" EchoGram - Intelligent Instagram Auto-Replier", delay=0.04, color='\033[95m')
+    typing_effect("Developed by ", delay=0.05)
+    typing_effect("   DARKDEVIL", delay=0.08, color='\033[91m')
+
+    show_motivation()
+
+    if not check_password():
+        sys.exit(1)
+
     asyncio.run(HeartInstagram().run())
